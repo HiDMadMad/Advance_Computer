@@ -35,12 +35,15 @@ class BankAccount
                 return AccountNumber;
             }
             
-            int GetBalance(int BalancePass)
+            double GetBalance(int BalancePass)
             {
                 if(password == BalancePass)
                     return balance;
                 else 
+                {
+                    std::cout<<"Wrong password!\n";
                     return -1;
+                }
             }
     //------------------------------------------------------------------------------
         // Password :
@@ -243,7 +246,7 @@ int main()
                     std::getline(std::cin>>std::ws, TargetAccountName);
                     std::cout<<"how much do you want to deposit : ";
                     std::cin>>DepositValue;
-                    Accounts[FindIndexByName(Accounts, MAX_ACCOUNTS, TargetAccountName)].deposit(DepositValue);
+                    Accounts[FindIndexByName(Accounts, AccountCounter, TargetAccountName)].deposit(DepositValue);
                 }
                 else if(!NameOrNum(DepositPath)) // by number
                 {
@@ -252,7 +255,7 @@ int main()
                     std::cin>>TargetAccountNum;
                     std::cout<<"how much do you want to deposit : ";
                     std::cin>>DepositValue;
-                    Accounts[FindIndexByNum(Accounts, MAX_ACCOUNTS, TargetAccountNum)].deposit(DepositValue);
+                    Accounts[FindIndexByNum(Accounts, AccountCounter, TargetAccountNum)].deposit(DepositValue);
                 }
                 break;
             }
@@ -271,7 +274,7 @@ int main()
                     std::cin>>WithrawValue;
                     std::cout<<"enter account password : ";
                     std::cin>>AccountPassword;
-                    Accounts[FindIndexByName(Accounts, MAX_ACCOUNTS, TargetAccountName)].withraw(AccountPassword, WithrawValue);
+                    Accounts[FindIndexByName(Accounts, AccountCounter, TargetAccountName)].withraw(AccountPassword, WithrawValue);
                 }
                 else if(!NameOrNum(WithrawPath)) // by number
                 {
@@ -282,7 +285,7 @@ int main()
                     std::cin>>WithrawValue;
                     std::cout<<"enter account password : ";
                     std::cin>>AccountPassword;
-                    Accounts[FindIndexByNum(Accounts, MAX_ACCOUNTS, TargetAccountNum)].withraw(AccountPassword, WithrawValue);
+                    Accounts[FindIndexByNum(Accounts, AccountCounter, TargetAccountNum)].withraw(AccountPassword, WithrawValue);
                 }
                 break;
             }
@@ -303,7 +306,7 @@ int main()
                     std::cin>>value;
                     std::cout<<"enter your password : ";
                     std::cin>>Acc1PassWord;
-                    Accounts[FindIndexByName(Accounts, MAX_ACCOUNTS, Acc1OwName)].TransferTo(Accounts[FindIndexByName(Accounts, MAX_ACCOUNTS, Acc2OwName)], Acc1PassWord, value);
+                    Accounts[FindIndexByName(Accounts, AccountCounter, Acc1OwName)].TransferTo(Accounts[FindIndexByName(Accounts, AccountCounter, Acc2OwName)], Acc1PassWord, value);
                 }
                 else if(!NameOrNum(ShowPath)) // by num
                 {
@@ -316,7 +319,7 @@ int main()
                     std::cin>>value;
                     std::cout<<"enter your password : ";
                     std::cin>>Acc1PassWord;
-                    Accounts[FindIndexByNum(Accounts, MAX_ACCOUNTS, Acc1Num)].TransferTo(Accounts[FindIndexByNum(Accounts, MAX_ACCOUNTS, Acc2Num)], Acc1PassWord, value);
+                    Accounts[FindIndexByNum(Accounts, AccountCounter, Acc1Num)].TransferTo(Accounts[FindIndexByNum(Accounts, AccountCounter, Acc2Num)], Acc1PassWord, value);
                         
                 }
                 break;
@@ -361,7 +364,7 @@ int main()
             }
             default :
             {
-                std::cout<<"wtf";
+                std::cout<<"Invalid option! Please try again.\n";
                 break;
             }
         }
@@ -369,4 +372,4 @@ int main()
 
     return 0;
 }
-//MadMad_372
+//MadMad_375
