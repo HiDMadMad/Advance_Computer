@@ -11,7 +11,7 @@ class BankAccount
         double balance{0}, limit{0};
     public :
         BankAccount() =  default;  // برای استفاده نکردن از ارایه پوینتری
-        BankAccount(std::string OwNm, int pass, double InitialBalance, double RemainBalance, int AccountNum) : OwnerName(OwNm), password(pass), balance(InitialBalance), limit(RemainBalance), AccountNumber(AccountNum) {}
+        BankAccount(std::string OwNm, int pass, double InitialBalance, double RemainBalance, int AccountNum) : OwnerName(OwNm), password(pass), balance(InitialBalance), AccountNumber(AccountNum) {}
         // {
         //     OwnerName = OwNm;
         //     password = pass;
@@ -72,12 +72,14 @@ class BankAccount
             {
                 if(pass == password)
                 {
-                    if(BalanceToWithraw>0 && balance>=(BalanceToWithraw-limit))
+                    if(BalanceToWithraw>0 && balance>=BalanceToWithraw)
                     {
                         balance-=BalanceToWithraw;
                         std::cout<<"withraw is successful!\n";
                     }
-                    else
+                    else if(BalanceToWithraw<0)
+                        std::cout<<"your request must be bigger than 0!";
+                    else 
                         std::cout<<"your balance is not enough!\n";
                 }
                 else
@@ -110,16 +112,19 @@ class BankAccount
 
 class SavingAccount : public BankAccount
 {
-
+    // private:
+    //     SavingAccount
 };
 
 
-bool NameOrNum(int choice)
+int NameOrNum(int choice)
 {
     if(choice == 1)
-        return true; // owner name
+        return 1; // owner name
+    else if(choice == 2)
+        return 0; // account number
     else
-        return false; // account number
+        return -1; // out of range
 }
 
 int FindIndexByNum(BankAccount BankAccs[], int NumOfBankAccs, int TargetNum)
@@ -142,6 +147,21 @@ int FindIndexByName(BankAccount BankAccs[], int NumOfBankAccs, std::string Targe
     return -1;
 }
 
+void PrintMenu()
+{
+    // std::cout<<"\n\nwhat do you want to do ?\n1-create new account\n2-show accounts\n3-show account info\n4-deposit\n5-withraw\n6-transfer\n7-show balance\n0-quit\nyour choice : ";
+    std::cout<<"\n\nwhat do you want to do ?"
+    <<"\n1-create new account"
+    <<"\n2-show accounts"
+    <<"\n3-show account info"
+    <<"\n4-deposit"
+    <<"\n5-withraw"
+    <<"\n6-transfer"
+    <<"\n7-show balance"
+    <<"\n0-quit"
+    <<"\nyour choice : ";
+}
+
 
 int main()
 {
@@ -149,7 +169,7 @@ int main()
     int AccountCounter{0}, InitialAccountNum{1001}, option;
     do
     {
-        std::cout<<"\n\nwhat do you want to do ?\n1-create new account\n2-show accounts\n3-show account info\n4-deposit\n5-withraw\n6-transfer\n7-show balance\n0-quit\nyour choice : ";
+        PrintMenu();
         std::cin>>option;
         switch(option)
         {
@@ -205,32 +225,20 @@ int main()
                 int DepositPath{0}, TargetAccountNum;  
                 std::cout<<"\ndo you have :\n1-account owner name\n2-account number\n";
                 std::cin>>DepositPath;
-                if(NameOrNum(DepositPath))
+                if(NameOrNum(DepositPath)==1)
                 {
                     std::cout<<"\nenter target owner name : ";
                     std::getline(std::cin>>std::ws, TargetAccountName);
-                    for(int i=0; i<AccountCounter; i++)
-                {
-                    if(Accounts[i].GetAccountOwnerName() == TargetAccountName)
-                    {
-                        Accounts[i].ShowInfo();
-                        break;
-                    }
+                    Accounts[FindIndexByName(Accounts, AccountCounter, TargetAccountName)].ShowInfo();
                 }
-                }
-                else if(!NameOrNum(DepositPath))
+                else if(NameOrNum(DepositPath)==0)
                 {
                     std::cout<<"\nenter target account number : ";
                     std::cin>>TargetAccountNum;
-                    for(int i=0; i<AccountCounter; i++)
-                {
-                    if(Accounts[i].GetAccountNumber() == TargetAccountNum)
-                    {
-                        Accounts[i].ShowInfo();
-                        break;
-                    }
+                    Accounts[FindIndexByNum(Accounts, AccountCounter, TargetAccountNum)].ShowInfo();
                 }
-                }
+                else
+                    std::cout<<"out of range..!\n";
                 break;
             }
             case 4: // deposit
@@ -239,24 +247,36 @@ int main()
                 int DepositPath{0};
                 std::cout<<"\ndo you have :\n1-account owner name\n2-account number\n";
                 std::cin>>DepositPath;
-                if(NameOrNum(DepositPath)) // by name
+                if(NameOrNum(DepositPath)==1) // by name
                 {
                     std::string TargetAccountName;
                     std::cout<<"\nenter target owner name : ";
                     std::getline(std::cin>>std::ws, TargetAccountName);
-                    std::cout<<"how much do you want to deposit : ";
-                    std::cin>>DepositValue;
-                    Accounts[FindIndexByName(Accounts, AccountCounter, TargetAccountName)].deposit(DepositValue);
+                    if(FindIndexByName(Accounts, AccountCounter, TargetAccountName) != -1)
+                    {
+                        std::cout<<"how much do you want to deposit : ";
+                        std::cin>>DepositValue;    
+                        Accounts[FindIndexByName(Accounts, AccountCounter, TargetAccountName)].deposit(DepositValue);
+                    }
+                    else
+                        std::cout<<"account was not found!\n";
                 }
-                else if(!NameOrNum(DepositPath)) // by number
+                else if(NameOrNum(DepositPath)==0) // by number
                 {
                     int  TargetAccountNum;
                     std::cout<<"\nenter target account number : ";
                     std::cin>>TargetAccountNum;
-                    std::cout<<"how much do you want to deposit : ";
-                    std::cin>>DepositValue;
-                    Accounts[FindIndexByNum(Accounts, AccountCounter, TargetAccountNum)].deposit(DepositValue);
+                    if(FindIndexByNum(Accounts, AccountCounter, TargetAccountNum) != -1)
+                    {
+                        std::cout<<"how much do you want to deposit : ";
+                        std::cin>>DepositValue;
+                        Accounts[FindIndexByNum(Accounts, AccountCounter, TargetAccountNum)].deposit(DepositValue);
+                    }
+                    else
+                        std::cout<<"account was not found!\n";
                 }
+                else
+                    std::cout<<"out of range..!\n";
                 break;
             }
             case 5: // withraw
@@ -265,73 +285,107 @@ int main()
                 int AccountPassword, WithrawPath{0};
                 std::cout<<"\ndo you have :\n1-account owner name\n2-account number\n";
                 std::cin>>WithrawPath;
-                if(NameOrNum(WithrawPath)) // by name
+                if(NameOrNum(WithrawPath)==1) // by name
                 {
                     std::string TargetAccountName;
                     std::cout<<"\nenter target owner name : ";
                     std::getline(std::cin>>std::ws, TargetAccountName);
-                    std::cout<<"how much do you want to withraw : ";
-                    std::cin>>WithrawValue;
-                    std::cout<<"enter account password : ";
-                    std::cin>>AccountPassword;
-                    Accounts[FindIndexByName(Accounts, AccountCounter, TargetAccountName)].withraw(AccountPassword, WithrawValue);
+                    if(FindIndexByName(Accounts, AccountCounter, TargetAccountName) != -1)
+                    {
+                        std::cout<<"how much do you want to withraw : ";
+                        std::cin>>WithrawValue;
+                        std::cout<<"enter account password : ";
+                        std::cin>>AccountPassword;
+                        Accounts[FindIndexByName(Accounts, AccountCounter, TargetAccountName)].withraw(AccountPassword, WithrawValue);
+                    }
+                    else
+                        std::cout<<"account was not found!\n";
                 }
-                else if(!NameOrNum(WithrawPath)) // by number
+                else if(NameOrNum(WithrawPath)==0) // by number
                 {
                     int TargetAccountNum;
                     std::cout<<"\nenter target account number : ";
                     std::cin>>TargetAccountNum;
-                    std::cout<<"how much do you want to withraw : ";
-                    std::cin>>WithrawValue;
-                    std::cout<<"enter account password : ";
-                    std::cin>>AccountPassword;
-                    Accounts[FindIndexByNum(Accounts, AccountCounter, TargetAccountNum)].withraw(AccountPassword, WithrawValue);
+                    if(FindIndexByNum(Accounts, AccountCounter, TargetAccountNum) != -1)
+                    {
+                        std::cout<<"how much do you want to withraw : ";
+                        std::cin>>WithrawValue;
+                        std::cout<<"enter account password : ";
+                        std::cin>>AccountPassword;
+                        Accounts[FindIndexByNum(Accounts, AccountCounter, TargetAccountNum)].withraw(AccountPassword, WithrawValue);
+                    }
+                    else
+                        std::cout<<"account was not found!\n";
                 }
+                else
+                    std::cout<<"out of range..!\n";
                 break;
             }
             case 6: // transfer
             {
-                int ShowPath, Acc1PassWord;
+                int TransferPath, Acc1PassWord;
                 double value;
                 std::cout<<"\ndo you have :\n1-accounts owners names\n2-accounts numbers\n";
-                std::cin>>ShowPath;
-                if(NameOrNum(ShowPath)) // by name
+                std::cin>>TransferPath;
+                if(NameOrNum(TransferPath)==1) // by name
                 {
                     std::string Acc1OwName, Acc2OwName;
                     std::cout<<"from account owner name : ";
                     std::getline(std::cin>>std::ws, Acc1OwName);
-                    std::cout<<"to account owner name : ";
-                    std::getline(std::cin>>std::ws, Acc2OwName);
-                    std::cout<<"how much do you want to transfer : ";
-                    std::cin>>value;
-                    std::cout<<"enter your password : ";
-                    std::cin>>Acc1PassWord;
-                    Accounts[FindIndexByName(Accounts, AccountCounter, Acc1OwName)].TransferTo(Accounts[FindIndexByName(Accounts, AccountCounter, Acc2OwName)], Acc1PassWord, value);
+                    if(FindIndexByName(Accounts, AccountCounter, Acc1OwName) != -1)
+                    {
+                        std::cout<<"to account owner name : ";
+                        std::getline(std::cin>>std::ws, Acc2OwName);
+                        if(FindIndexByName(Accounts, AccountCounter, Acc2OwName) != -1)
+                        {
+                            std::cout<<"how much do you want to transfer : ";
+                            std::cin>>value;
+                            std::cout<<"enter your password : ";
+                            std::cin>>Acc1PassWord;
+                            Accounts[FindIndexByName(Accounts, AccountCounter, Acc1OwName)].TransferTo(Accounts[FindIndexByName(Accounts, AccountCounter, Acc2OwName)], Acc1PassWord, value);
+                        }
+                        else 
+                            std::cout<<"receiver account was not found!\n";
+                    }
+                    else
+                        std::cout<<"sender account was not found!\n";
                 }
-                else if(!NameOrNum(ShowPath)) // by num
+                else if(NameOrNum(TransferPath)==0) // by num
                 {
                     int Acc1Num, Acc2Num;
                     std::cout<<"from account number : ";
                     std::cin>>Acc1Num;
-                    std::cout<<"to account number : ";
-                    std::cin>>Acc2Num;
-                    std::cout<<"how much do you want to transfer : ";
-                    std::cin>>value;
-                    std::cout<<"enter your password : ";
-                    std::cin>>Acc1PassWord;
-                    Accounts[FindIndexByNum(Accounts, AccountCounter, Acc1Num)].TransferTo(Accounts[FindIndexByNum(Accounts, AccountCounter, Acc2Num)], Acc1PassWord, value);
-                        
+                    if(FindIndexByNum(Accounts, AccountCounter, Acc1Num) != -1)
+                    {
+                        std::cout<<"to account number : ";
+                        std::cin>>Acc2Num;
+                        if(FindIndexByNum(Accounts, AccountCounter, Acc2Num) != -1)
+                        {
+                            std::cout<<"how much do you want to transfer : ";
+                            std::cin>>value;
+                            std::cout<<"enter your password : ";
+                            std::cin>>Acc1PassWord;
+                            Accounts[FindIndexByNum(Accounts, AccountCounter, Acc1Num)].TransferTo(Accounts[FindIndexByNum(Accounts, AccountCounter, Acc2Num)], Acc1PassWord, value);
+                        }
+                        else 
+                            std::cout<<"receiver account was not found!\n";
+                    }
+                    else 
+                        std::cout<<"receiver account was not found!\n";
                 }
+                else
+                    std::cout<<"out of range..!\n";
                 break;
             }
-            case 7:
+            case 7: // show balance
             {
-                std::string TargetAccountName;
-                int AccountPassword, ShowPath{0}, TargetAccountNum;
+                
+                int AccountPassword, ShowPath{0};
                 std::cout<<"\ndo you have :\n1-account owner name\n2-account number\n";
                 std::cin>>ShowPath;
-                if(NameOrNum(ShowPath))
+                if(NameOrNum(ShowPath)==1) // by name
                 {
+                    std::string TargetAccountName;
                     std::cout<<"\nenter target owner name : ";
                     std::getline(std::cin>>std::ws, TargetAccountName);
                     std::cout<<"enter account password : ";
@@ -345,8 +399,9 @@ int main()
                         }
                     }
                 }
-                else if(!NameOrNum(ShowPath))
+                else if(NameOrNum(ShowPath)==0) // by num
                 {
+                    int TargetAccountNum;
                     std::cout<<"\nenter target account number : ";
                     std::cin>>TargetAccountNum;
                     std::cout<<"enter account password : ";
@@ -360,6 +415,8 @@ int main()
                         }
                     }
                 }
+                else
+                    std::cout<<"out of range..!\n";
                 break;
             }
             default :
@@ -372,4 +429,4 @@ int main()
 
     return 0;
 }
-//MadMad_375
+//MadMad_432
