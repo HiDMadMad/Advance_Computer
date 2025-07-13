@@ -67,7 +67,14 @@ class BankAccount
                     std::cout<<"deposit is successful!\n";
                 }
             }
-        
+            
+            void TransferDeposit(double  NewBalance)
+            {
+                if(NewBalance>0)
+                {
+                    balance+=NewBalance;
+                }
+            }
             void withraw(int pass, double BalanceToWithraw)
             {
                 if(pass == password)
@@ -103,7 +110,7 @@ class BankAccount
                 else
                 {
                     balance-=TransferValue;
-                    ToAccount.deposit(TransferValue);
+                    ToAccount.TransferDeposit (TransferValue);
                     std::cout<<"transfer successful!\n";
                 }
             }
@@ -429,4 +436,4 @@ int main()
 
     return 0;
 }
-//MadMad_432
+//MadMad_439
